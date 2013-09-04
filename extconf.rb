@@ -1,19 +1,13 @@
-require "rubygems" unless defined?(Gem)
 require "mkmf"
 
-hoge = Gem::GemPathSearcher.new.find("narray")
-narray_fullname = hoge.full_name
-narray_installpath = hoge.installation_path
-narray_include = "#{narray_installpath}/gems/#{narray_fullname}/"
-narray_lib = "#{narray_installpath}/gems/#{narray_fullname}/"
-
-dir_config('narray',narray_include,narray_lib)
-dir_config('netcdf','/usr/local')
+narray_spec = Gem::Specification.find_by_name('narray')
+narray_gem_path = narray_spec.full_gem_path
+dir_config('narray', narray_gem_path, narray_gem_path)
 
 if ( ! ( have_header("narray.h") && have_header("narray_config.h") ) ) then
 print <<EOS
-** configure error **  
-   Header narray.h or narray_config.h is not found. If you have these files in 
+** configure error **
+   Header narray.h or narray_config.h is not found. If you have these files in
    /narraydir/include, try the following:
 
    % ruby extconf.rb --with-narray-include=/narraydir/include
@@ -40,7 +34,7 @@ if File.directory?("/usr/include/netcdf")  #-- for Vine linux
   $CFLAGS += ' ' + cflags
   $LOCAL_LIBS += ' ' + libs
 end
- 
+
 if (enable_config('opendap',true) && ( xsystem("opendap-config --libs") ||
                                        xsystem("ncdap-config --libs") ) )
 
@@ -56,7 +50,7 @@ if (enable_config('opendap',true) && ( xsystem("opendap-config --libs") ||
   else
     print <<-EOS
     ** Message **  Compiling with OPeNDAP/DODS-enabled NetCDF library.
- 
+
     This is because the command opendap-config is found in your system.
     If you want to use the ordinary (non-DODS) version of NetCDF,
     run extconf.rb with option --disable-opendap.
@@ -71,10 +65,10 @@ if (enable_config('opendap',true) && ( xsystem("opendap-config --libs") ||
   CONFIG['LDSHARED'].sub!(/gcc/,'g++')
   $LIBS.sub!(/-lc\s/,'') ; $LIBS.sub!(/-lc$/,'')
   print <<-EOS
-    ** Warning **  non-portable treatments are made, 
+    ** Warning **  non-portable treatments are made,
     which was sucessfull redhat linux 9:
      * gcc was replaced with g++ in CONFIG['LDSHARED']
-     * -lc library was removed if in $LIBS 
+     * -lc library was removed if in $LIBS
 
   EOS
   #  p '@@@'
@@ -93,8 +87,8 @@ else
   end
   if ( ! ( have_header("netcdf.h") && have_library("netcdf") ) )then
     print <<-EOS
-    ** configure error **  
-       Header netcdf.h or the compiled netcdf library is not found. 
+    ** configure error **
+       Header netcdf.h or the compiled netcdf library is not found.
        If you have the library installed under /netcdfdir (that is, netcdf.h is
        in /netcdfdir/include and the library in /netcdfdir/lib/),
        try the following:
@@ -112,6 +106,8 @@ if /cygwin|mingw/ =~ RUBY_PLATFORM
    have_library("narray") || raise("ERROR: narray library is not found")
 end
 
+
+$libs << "-l:narray.so" # Fix underlinking issue on Gentoo (extension linked with --as-needed --no-undefined)
 create_makefile "numru/netcdfraw"
 
 ######  Modify Makefile: #######
@@ -125,9 +121,9 @@ oldmkfl.each_line{ |line|
       newmkfl.puts("\t\t@$(RM) *.nc demo/*.nc demo/*~ lib/*~ doc/*~ test/*.nc test/*~ Makefile.orig")
    when /^all:/
       newmkfl.puts(line)
-      newmkfl.puts("")         
+      newmkfl.puts("")
       newmkfl.puts("test: all")            # insert the "test" target
-      newmkfl.puts("\t\t@cd test && ruby test.rb && echo 'test did not fail :-p (please ignore the warnings)' && cd ..") 
+      newmkfl.puts("\t\t@cd test && ruby test.rb && echo 'test did not fail :-p (please ignore the warnings)' && cd ..")
    when /lib\/netcdf/
       line = line.chomp! + "/"
       newmkfl.puts(line)
