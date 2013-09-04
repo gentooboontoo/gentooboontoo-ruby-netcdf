@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.files = Dir["demo/*",
                 "doc/*",
                 "ext/netcdfraw.c",
-                "lib/*",
+                "lib/**/*",
                 "test/*",
                 "ChangeLog",
                 "INSTALL",
