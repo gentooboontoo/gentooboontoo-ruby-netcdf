@@ -1,3 +1,4 @@
+require "rubygems"
 require "mkmf"
 
 narray_spec = Gem::Specification.find_by_name('narray')
