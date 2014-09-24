@@ -1,5 +1,5 @@
 # OUTDATED
-# use gem build ruby-net-cdf.gemspec ti build gem
+# use gem build ruby-net-cdf.gemspec to build gem
 require 'rubygems'
 require 'rubygems/package_task'
 
