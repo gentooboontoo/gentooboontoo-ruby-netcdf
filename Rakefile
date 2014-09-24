@@ -1,7 +1,10 @@
-require 'rake/gempackagetask'
+# OUTDATED
+# use gem build ruby-net-cdf.gemspec ti build gem
+require 'rubygems'
+require 'rubygems/package_task'
 
 NAME = 'ruby-netcdf'
-VER = '0.6.6.1'
+VER = '0.6.6.3'
 
 PKG_FILES = FileList[
   '**',
@@ -32,10 +35,10 @@ spec = Gem::Specification.new do |s|
   s.add_runtime_dependency(%q<narray_miss>, [">= 0"])
   #s.extra_rdoc_files = ['README']
 
-  s.extensions << "extconf.rb"
+  s.extensions << "ext/extconf.rb"
 end
 
-Rake::GemPackageTask.new(spec) do |pkg|
+Gem::PackageTask.new(spec) do |pkg|
   pkg.gem_spec = spec
   pkg.need_tar = true
 end
